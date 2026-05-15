@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>CYRELES · Integral de Empaques</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0d12;
+    --surface: #111722;
+    --surface2: #161d2b;
+    --border: #1e2d42;
+    --accent: #00c8ff;
+    --accent2: #ff6b35;
+    --accent3: #39ff14;
+    --text: #d0e4f7;
+    --text2: #6b8aaa;
+    --danger: #ff3b5c;
+    --warn: #ffb800;
+    --success: #39ff14;
+    --radius: 8px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── LOGIN ── */
+  #loginScreen {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .login-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 40px 36px;
+    width: 340px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .login-box::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(0,200,255,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .login-logo {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .login-sub {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text2);
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+
+  .field-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--text2);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .field-wrap { margin-bottom: 18px; }
+
+  input[type=text], input[type=password], input[type=number], textarea, select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color .2s;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(0,200,255,0.1);
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 11px 22px;
+    border-radius: var(--radius);
+    border: none; cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px; font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: all .2s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+    width: 100%;
+  }
+
+  .btn-primary:hover { background: #00e5ff; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,200,255,0.3); }
+
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-danger:hover { background: #ff1a40; }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text2); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-success { background: var(--accent3); color: #000; }
+  .btn-warn { background: var(--warn); color: #000; }
+  .btn-sm { padding: 6px 14px; font-size: 12px; }
+
+  .login-err {
+    color: var(--danger);
+    font-size: 12px;
+    text-align: center;
+    min-height: 18px;
+    margin-bottom: 12px;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  /* ── TOPBAR ── */
+  #app { display:none; flex-direction:column; min-height:100vh; }
+
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 16px;
+    height: 56px;
+    display: flex; align-items: center; gap: 12px;
+    position: sticky; top: 0; z-index: 100;
+  }
+
+  .topbar-logo {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 20px; font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 2px;
+    flex: 1;
+  }
+
+  .topbar-logo span { color: var(--text2); font-weight: 400; font-size: 13px; }
+
+  .topbar-btn {
+    background: none; border: 1px solid var(--border);
+    color: var(--text2); padding: 6px 14px;
+    border-radius: var(--radius); cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px; letter-spacing: 1px;
+    display: flex; align-items: center; gap: 6px;
+    transition: all .2s;
+  }
+
+  .topbar-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── NAV TABS ── */
+  .nav-tabs {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex; overflow-x: auto; gap: 0;
+    scrollbar-width: none;
+  }
+
+  .nav-tab {
+    padding: 12px 20px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text2); cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all .2s;
+    flex-shrink: 0;
+  }
+
+  .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .nav-tab:hover { color: var(--text); }
+
+  /* ── CONTENT ── */
+  .content { padding: 16px; flex: 1; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* ── STATS GRID ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .stat-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 32px; font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 10px; letter-spacing: 1.5px;
+    color: var(--text2); text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* ── CYREL LIST ── */
+  .cyrel-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .cyrel-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color .2s;
+    cursor: pointer;
+  }
+
+  .cyrel-card:hover { border-color: var(--accent); }
+
+  .cyrel-card-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px;
+  }
+
+  .cyrel-thumb {
+    width: 60px; height: 60px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text2); font-size: 22px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .cyrel-thumb img { width:100%; height:100%; object-fit:cover; }
+
+  .cyrel-info { flex: 1; min-width: 0; }
+
+  .cyrel-code {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px; color: var(--accent);
+    font-weight: 600;
+  }
+
+  .cyrel-name {
+    font-size: 14px; font-weight: 500;
+    color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-top: 2px;
+  }
+
+  .cyrel-meta {
+    font-size: 11px; color: var(--text2);
+    margin-top: 3px;
+  }
+
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+
+  .badge-good { background: rgba(57,255,20,0.15); color: var(--accent3); }
+  .badge-warn { background: rgba(255,184,0,0.15); color: var(--warn); }
+  .badge-bad { background: rgba(255,59,92,0.15); color: var(--danger); }
+
+  /* ── VIDA UTIL BAR ── */
+  .vida-bar-wrap { margin: 10px 12px; }
+  .vida-bar-label { font-size: 11px; color: var(--text2); display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .vida-bar { height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .vida-bar-fill { height: 100%; border-radius: 4px; transition: width .4s; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 500;
+    display: none; align-items: flex-end; justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: 16px 16px 0 0;
+    width: 100%; max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 20px 16px 32px;
+    animation: slideUp .25s ease;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .modal-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px; font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--accent);
+    margin-bottom: 16px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+
+  .modal-close {
+    background: none; border: none; cursor: pointer;
+    color: var(--text2); font-size: 20px;
+    padding: 4px; line-height: 1;
+  }
+
+  /* ── AI PANEL ── */
+  .ai-chat {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    min-height: 120px;
+    max-height: 300px;
+    overflow-y: auto;
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  .ai-msg { margin-bottom: 10px; }
+  .ai-msg.user { color: var(--accent); }
+  .ai-msg.assistant { color: var(--text); }
+  .ai-msg .role {
+    font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text2); margin-bottom: 3px;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  /* ── CAMERA ── */
+  .camera-wrap {
+    background: var(--bg);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    position: relative;
+    min-height: 200px;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  #cameraFeed { width: 100%; display: none; border-radius: var(--radius); }
+  #capturedCanvas { width: 100%; display: none; border-radius: var(--radius); }
+
+  .cam-placeholder { color: var(--text2); text-align: center; font-size: 13px; }
+  .cam-placeholder .icon { font-size: 40px; margin-bottom: 8px; }
+
+  /* ── DEFECTOS CHECKLIST ── */
+  .defect-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+
+  .defect-chip {
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 12px; cursor: pointer;
+    transition: all .15s; color: var(--text2);
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  .defect-chip.selected { border-color: var(--danger); background: rgba(255,59,92,0.12); color: var(--danger); }
+
+  /* ── SEARCH ── */
+  .search-wrap { position: relative; margin-bottom: 14px; }
+  .search-wrap input { padding-left: 36px; }
+  .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text2); font-size: 15px; }
+
+  /* ── TRAMA TABLE ── */
+  .trama-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .trama-cell {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 6px;
+    text-align: center;
+    font-size: 11px;
+  }
+
+  .trama-cell .val {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 16px;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* ── SPINNER ── */
+  .spinner {
+    width: 20px; height: 20px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    display: inline-block;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── UPLOAD ZONE ── */
+  .upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s;
+    margin-bottom: 12px;
+  }
+
+  .upload-zone:hover { border-color: var(--accent); }
+  .upload-zone .icon { font-size: 32px; margin-bottom: 8px; }
+  .upload-zone p { font-size: 13px; color: var(--text2); }
+
+  /* ── FORM ROW ── */
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* ── NOTIFICATION ── */
+  .notif {
+    position: fixed; bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 12px 20px;
+    font-size: 13px;
+    z-index: 9999;
+    min-width: 200px; text-align: center;
+    animation: fadeInUp .3s ease;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+
+  @keyframes fadeInUp {
+    from { opacity:0; transform: translateX(-50%) translateY(10px); }
+    to { opacity:1; transform: translateX(-50%) translateY(0); }
+  }
+
+  /* ── CHANGE KEY ── */
+  .key-section {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-top: 16px;
+  }
+
+  .key-generated {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 22px;
+    color: var(--accent3);
+    text-align: center;
+    letter-spacing: 4px;
+    padding: 16px;
+    background: var(--bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--accent3);
+    margin: 10px 0;
+  }
+
+  .comparison-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .comp-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px;
+    text-align: center;
+    font-size: 11px; color: var(--text2);
+  }
+
+  .comp-box img, .comp-box canvas {
+    width: 100%; height: 100px; object-fit: cover;
+    border-radius: 4px; margin-bottom: 4px;
+    background: var(--surface);
+    display: block;
+  }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+  .tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 9px;
+    font-size: 11px; color: var(--text2);
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  select option { background: var(--surface); }
+
+  .empty-state {
+    text-align: center; padding: 40px 20px;
+    color: var(--text2); font-size: 13px;
+  }
+
+  .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+  .progress-ring {
+    width: 70px; height: 70px;
+    position: relative; flex-shrink: 0;
+  }
+
+  .cyrel-actions { display: flex; gap: 8px; padding: 0 12px 12px; flex-wrap: wrap; }
+
+  .scroll-hint { text-align: center; font-size: 11px; color: var(--text2); padding: 8px 0; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════ LOGIN ════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">⬡ CYRELES</div>
+    <div class="login-sub">Integral de Empaques SAS · Área de Impresión</div>
+    <div class="field-wrap">
+      <div class="field-label">Usuario</div>
+      <input type="text" id="loginUser" placeholder="Melendo" autocomplete="off">
+    </div>
+    <div class="field-wrap">
+      <div class="field-label">Contraseña</div>
+      <input type="password" id="loginPass" placeholder="••••••••" id="loginPass">
+    </div>
+    <div class="login-err" id="loginErr"></div>
+    <button class="btn btn-primary" onclick="doLogin()">🔐 INGRESAR</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════ APP ════════════════════════════ -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-logo">⬡ CYRELES <span>| Integral de Empaques</span></div>
+    <button class="topbar-btn" onclick="openChangeKey()">🔑</button>
+    <button class="topbar-btn" onclick="doLogout()">⏏</button>
+  </div>
+
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showSection('dashboard')">📊 Dashboard</div>
+    <div class="nav-tab" onclick="showSection('inventario')">🗄️ Inventario</div>
+    <div class="nav-tab" onclick="showSection('nuevo')">➕ Nuevo</div>
+    <div class="nav-tab" onclick="showSection('inspeccion')">🔍 Inspección IA</div>
+    <div class="nav-tab" onclick="showSection('comparar')">📷 Verificar Arte</div>
+    <div class="nav-tab" onclick="showSection('excel')">📊 Excel / PC</div>
+  </div>
+
+  <div class="content">
+
+    <!-- ── DASHBOARD ── -->
+    <div id="sec-dashboard" class="section active">
+      <div class="stats-grid" id="statsGrid"></div>
+      <div class="card">
+        <div class="card-title">⚠️ Cyreles Críticos</div>
+        <div id="criticos-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📅 Últimos Registros</div>
+        <div id="recientes-list"></div>
+      </div>
+    </div>
+
+    <!-- ── INVENTARIO ── -->
+    <div id="sec-inventario" class="section">
+      <div class="search-wrap">
+        <span class="search-icon">🔎</span>
+        <input type="text" id="searchInput" placeholder="Código, nombre, arte..." oninput="renderInventario()">
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <select id="filterEstado" onchange="renderInventario()" style="flex:1;font-size:12px;">
+          <option value="">Todos los estados</option>
+          <option value="bueno">✅ Bueno</option>
+          <option value="advertencia">⚠️ Advertencia</option>
+          <option value="critico">❌ Crítico</option>
+        </select>
+        <select id="filterMaterial" onchange="renderInventario()" style="flex:1;font-size:12px;">
+          <option value="">Todos los materiales</option>
+          <option value="polietileno">Polietileno</option>
+          <option value="bopp">BOPP</option>
+          <option value="poliester">Poliéster</option>
+          <option value="papel">Papel</option>
+          <option value="nylon">Nylon</option>
+        </select>
+      </div>
+      <div class="cyrel-grid" id="cyrelGrid"></div>
+    </div>
+
+    <!-- ── NUEVO CYREL ── -->
+    <div id="sec-nuevo" class="section">
+      <div class="card">
+        <div class="card-title">➕ Registrar Nuevo Cyrel</div>
+
+        <div class="form-row">
+          <div class="field-wrap">
+            <div class="field-label">Código</div>
+            <input type="text" id="nCodigo" placeholder="CYR-2024-001">
+          </div>
+          <div class="field-wrap">
+            <div class="field-label">Lpi (líneas/pulgada)</div>
+            <input type="number" id="nLpi" placeholder="150">
+          </div>
+        </div>
+
+        <div class="field-wrap">
+          <div class="field-label">Nombre del Arte</div>
+          <input type="text" id="nNombre" placeholder="Ej: Salchichón Premium 500g">
+        </div>
+
+        <div class="form-row">
+          <div class="field-wrap">
+            <div class="field-label">Material sustrato</div>
+            <select id="nMaterial">
+              <option value="polietileno">Polietileno</option>
+              <option value="bopp">BOPP</option>
+              <option value="poliester">Poliéster</option>
+              <option value="papel">Papel</option>
+              <option value="nylon">Nylon</option>
+            </select>
+          </div>
+          <div class="field-wrap">
+            <div class="field-label">Colores (número)</div>
+            <input type="number" id="nColores" placeholder="4" min="1" max="10">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field-wrap">
+            <div class="field-label">Tirajes realizados</div>
+            <input type="number" id="nTirajes" placeholder="0" min="0">
+          </div>
+          <div class="field-wrap">
+            <div class="field-label">Vida útil estimada (tirajes)</div>
+            <input type="number" id="nVidaMax" placeholder="1000000">
+          </div>
+        </div>
+
+        <div class="field-wrap">
+          <div class="field-label">Foto del Cyrel / Arte</div>
+          <div class="upload-zone" onclick="document.getElementById('imgFile').click()">
+            <div class="icon">📷</div>
+            <p>Toca para tomar foto o seleccionar imagen</p>
+            <input type="file" id="imgFile" accept="image/*" capture="environment" style="display:none" onchange="previewImg(this)">
+          </div>
+          <img id="imgPreview" src="" style="display:none;width:100%;border-radius:var(--radius);max-height:200px;object-fit:cover;margin-bottom:10px;">
+        </div>
+
+        <div class="field-wrap">
+          <div class="field-label">Notas</div>
+          <textarea id="nNotas" rows="3" placeholder="Observaciones del cyrel..."></textarea>
+        </div>
+
+        <button class="btn btn-primary" onclick="guardarCyrel()">💾 GUARDAR CYREL</button>
+      </div>
+    </div>
+
+    <!-- ── INSPECCIÓN IA ── -->
+    <div id="sec-inspeccion" class="section">
+      <div class="card">
+        <div class="card-title">🔍 Inspección Inteligente de Cyrel</div>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:14px;">Toma una foto del cyrel. La IA analizará vida útil, defectos en relieves y tramas.</p>
+
+        <div class="field-wrap">
+          <div class="field-label">Seleccionar Cyrel</div>
+          <select id="inspecCyrelSel"></select>
+        </div>
+
+        <div class="camera-wrap" id="inspCamWrap">
+          <div class="cam-placeholder">
+            <div class="icon">🎥</div>
+            <p>Cámara inactiva</p>
+          </div>
+          <video id="inspVideo" autoplay playsinline style="width:100%;display:none;border-radius:var(--radius);"></video>
+          <canvas id="inspCanvas" style="display:none;width:100%;border-radius:var(--radius);"></canvas>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" onclick="startCamera('inspVideo','inspCanvas')">📷 Abrir Cámara</button>
+          <button class="btn btn-warn btn-sm" onclick="captureCamera('inspVideo','inspCanvas','inspResult')">⚡ Capturar</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('inspFileInput').click()">🖼️ Galería</button>
+          <input type="file" id="inspFileInput" accept="image/*" style="display:none" onchange="loadFromFile(this,'inspCanvas','inspResult')">
+        </div>
+
+        <div class="field-wrap">
+          <div class="field-label">Defectos visibles (marcar)</div>
+          <div class="defect-list" id="defectList">
+            <div class="defect-chip" onclick="toggleDefect(this,'Pinhole')">⚪ Pinhole</div>
+            <div class="defect-chip" onclick="toggleDefect(this,'Halo')">🔵 Halo</div>
+            <div class="defect-chip" onclick="toggleDefect(this,'Punto sucio')">🟤 Punto sucio</div>
+            <div class="defect-chip" onclick="toggleDefect(this,'Desgaste relieve')">🔴 Desgaste relieve</div>
+            <div class="defect-chip" onclick="toggleDefect(this,'Crack')">⚡ Crack</div>
+            <div class="defect-chip" onclick="toggleDefect(this,'Trama colapsada')">🟡 Trama colapsada</div>
+            <div class="defect-chip" onclick="toggleDefect(this,'Borde roto')">🟠 Borde roto</div>
+            <div class="defect-chip" onclick="toggleDefect(this,'Suciedad')">🟣 Suciedad</div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" style="margin-bottom:12px;" onclick="analizarCyrelIA()">
+          🤖 ANALIZAR CON IA
+        </button>
+
+        <div class="ai-chat" id="inspResult">
+          <div style="color:var(--text2);font-size:12px;">El resultado del análisis aparecerá aquí...</div>
+        </div>
+
+        <button class="btn btn-success btn-sm" onclick="guardarInspeccion()" style="margin-top:8px;">
+          💾 Guardar inspección
+        </button>
+      </div>
+    </div>
+
+    <!-- ── COMPARAR / VERIFICAR ARTE ── -->
+    <div id="sec-comparar" class="section">
+      <div class="card">
+        <div class="card-title">📷 Verificar Arte Impreso vs Cyrel</div>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:14px;">Toma foto del material impreso y compara con el arte digital del cyrel. La IA detectará diferencias de color, registro y calidad.</p>
+
+        <div class="field-wrap">
+          <div class="field-label">Seleccionar Cyrel de referencia</div>
+          <select id="compCyrelSel" onchange="loadRefImage()"></select>
+        </div>
+
+        <div class="comparison-grid">
+          <div class="comp-box">
+            <canvas id="refCanvas" style="background:var(--surface2);"></canvas>
+            <span>Arte Referencia (Cyrel)</span>
+          </div>
+          <div class="comp-box">
+            <canvas id="printCanvas" style="background:var(--surface2);"></canvas>
+            <span>Impresión Capturada</span>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" onclick="startCamera('compVideo','printCanvas')">📷 Abrir Cámara</button>
+          <button class="btn btn-warn btn-sm" onclick="captureCamera('compVideo','printCanvas','compResult')">⚡ Capturar impresión</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('compFileInput').click()">🖼️ Galería</button>
+          <input type="file" id="compFileInput" accept="image/*" style="display:none" onchange="loadFromFile(this,'printCanvas','compResult')">
+        </div>
+
+        <video id="compVideo" autoplay playsinline style="display:none;width:100%;border-radius:var(--radius);max-height:200px;"></video>
+
+        <button class="btn btn-primary" style="margin-bottom:12px;" onclick="compararArtes()">
+          🤖 COMPARAR CON IA
+        </button>
+
+        <div class="ai-chat" id="compResult">
+          <div style="color:var(--text2);font-size:12px;">El análisis comparativo aparecerá aquí...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── EXCEL / PC ── -->
+    <div id="sec-excel" class="section">
+
+      <!-- EXPORTAR -->
+      <div class="card">
+        <div class="card-title">📤 Exportar a Excel</div>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:14px;">Descarga el inventario completo en formato .xlsx para trabajar desde PC.</p>
+
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
+          <button class="btn btn-success" onclick="exportarInventarioExcel()">
+            📋 Exportar Inventario Completo
+          </button>
+          <button class="btn btn-ghost" onclick="exportarInspeccionesExcel()">
+            🔍 Exportar Historial de Inspecciones
+          </button>
+          <button class="btn btn-ghost" onclick="exportarPlantilla()">
+            📄 Descargar Plantilla de Importación
+          </button>
+        </div>
+
+        <div class="key-section" style="margin-top:0;">
+          <div style="font-size:11px;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">📊 Vista previa del export</div>
+          <div style="overflow-x:auto;">
+            <table id="previewTable" style="width:100%;border-collapse:collapse;font-size:11px;font-family:'Share Tech Mono',monospace;"></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- IMPORTAR -->
+      <div class="card">
+        <div class="card-title">📥 Importar desde Excel / CSV</div>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:14px;">Carga un archivo .xlsx o .csv con datos de cyreles. Usa la plantilla descargable para el formato correcto.</p>
+
+        <div class="upload-zone" onclick="document.getElementById('excelFileInput').click()">
+          <div class="icon">📂</div>
+          <p>Toca para seleccionar archivo .xlsx o .csv</p>
+          <input type="file" id="excelFileInput" accept=".xlsx,.csv,.xls" style="display:none" onchange="importarExcel(this)">
+        </div>
+
+        <div id="importPreview" style="display:none;">
+          <div style="font-size:11px;color:var(--text2);margin-bottom:8px;">Vista previa de datos a importar:</div>
+          <div style="overflow-x:auto;">
+            <table id="importTable" style="width:100%;border-collapse:collapse;font-size:11px;"></table>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            <button class="btn btn-success" onclick="confirmarImport()">✅ Confirmar importación</button>
+            <button class="btn btn-danger btn-sm" onclick="cancelarImport()">✕ Cancelar</button>
+          </div>
+        </div>
+
+        <div id="importMsg" style="font-size:12px;color:var(--text2);min-height:20px;margin-top:8px;"></div>
+      </div>
+
+      <!-- SINCRONIZACIÓN PC -->
+      <div class="card">
+        <div class="card-title">💻 Usar desde PC</div>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:14px;">Para abrir esta app en el computador:</p>
+        <div style="background:var(--bg);border-radius:var(--radius);padding:14px;font-size:12px;line-height:2;font-family:'Share Tech Mono',monospace;color:var(--text);">
+          1. Descarga el archivo <span style="color:var(--accent)">cyreles-inventario.html</span><br>
+          2. Ábrelo en <span style="color:var(--accent)">Chrome o Edge</span> en tu PC<br>
+          3. Los datos se guardan en <span style="color:var(--accent)">localStorage</span> del navegador<br>
+          4. Exporta a Excel para compartir con otros equipos<br>
+          5. Importa el Excel para sincronizar datos entre dispositivos
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" onclick="exportarJSON()">💾 Backup completo (JSON)</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('jsonRestoreInput').click()">📂 Restaurar backup</button>
+          <input type="file" id="jsonRestoreInput" accept=".json" style="display:none" onchange="importarJSON(this)">
+        </div>
+      </div>
+
+    </div><!-- /sec-excel -->
+
+  </div><!-- /content -->
+</div><!-- /app -->
+
+<!-- ══════════ SECCIÓN EXCEL / PC ══════════ (insertada dentro de content via JS) -->
+
+<!-- ════════════════ MODAL DETALLE CYREL ════════════════ -->
+<div class="modal-overlay" id="cyrelDetailModal">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="mdTitle">Detalle Cyrel</span>
+      <button class="modal-close" onclick="closeModal('cyrelDetailModal')">✕</button>
+    </div>
+    <div id="mdContent"></div>
+  </div>
+</div>
+
+<!-- ════════════════ MODAL CAMBIO DE CLAVE ════════════════ -->
+<div class="modal-overlay" id="keyModal">
+  <div class="modal">
+    <div class="modal-title">
+      <span>🔑 Cambio de Contraseña</span>
+      <button class="modal-close" onclick="closeModal('keyModal')">✕</button>
+    </div>
+
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px;">Puedes cambiar tu contraseña manualmente o generar una nueva clave segura con IA al tomar una foto.</p>
+
+    <div class="field-wrap">
+      <div class="field-label">Contraseña actual</div>
+      <input type="password" id="keyOld" placeholder="Contraseña actual">
+    </div>
+    <div class="field-wrap">
+      <div class="field-label">Nueva contraseña</div>
+      <input type="password" id="keyNew" placeholder="Mínimo 6 caracteres">
+    </div>
+    <div class="field-wrap">
+      <div class="field-label">Confirmar contraseña</div>
+      <input type="password" id="keyConfirm" placeholder="Repite la contraseña">
+    </div>
+
+    <button class="btn btn-primary" onclick="cambiarClave()" style="margin-bottom:16px;">💾 CAMBIAR CONTRASEÑA</button>
+
+    <hr>
+
+    <div class="key-section">
+      <div class="card-title" style="font-size:14px;">🤖 Generar clave con IA (foto)</div>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:10px;">Toma una foto de cualquier objeto: la IA generará una clave segura basada en lo que ve.</p>
+
+      <div class="camera-wrap" style="min-height:140px;">
+        <div class="cam-placeholder" id="keyCapPlaceholder">
+          <div class="icon">📸</div>
+          <p>Toca para activar cámara</p>
+        </div>
+        <video id="keyVideo" autoplay playsinline style="width:100%;display:none;border-radius:var(--radius);"></video>
+        <canvas id="keyCanvas" style="display:none;width:100%;border-radius:var(--radius);"></canvas>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" onclick="startCamera('keyVideo','keyCanvas')">📷 Cámara</button>
+        <button class="btn btn-warn btn-sm" onclick="captureCamera('keyVideo','keyCanvas','keyGenResult')">⚡ Capturar</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('keyFileInput').click()">🖼️ Galería</button>
+        <input type="file" id="keyFileInput" accept="image/*" style="display:none" onchange="loadFromFile(this,'keyCanvas','keyGenResult')">
+      </div>
+
+      <button class="btn btn-success" onclick="generarClaveIA()" style="width:100%;margin-bottom:10px;">🤖 GENERAR CLAVE CON IA</button>
+
+      <div id="keyGenResult" style="color:var(--text2);font-size:12px;min-height:20px;"></div>
+
+      <div class="key-generated" id="keyGenDisplay" style="display:none;"></div>
+
+      <button class="btn btn-primary" id="btnAplicarClave" style="display:none;margin-top:10px;width:100%;" onclick="aplicarClaveGenerada()">
+        ✅ APLICAR ESTA CLAVE
+      </button>
+    </div>
+
+    <div class="login-err" id="keyErr" style="margin-top:10px;"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+//  STATE & DB
+// ══════════════════════════════════════════════════════════════
+const DB_KEY = 'cyreles_db_v3';
+
+function loadDB() {
+  try { return JSON.parse(localStorage.getItem(DB_KEY)) || defaultDB(); }
+  catch { return defaultDB(); }
+}
+
+function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+
+function defaultDB() {
+  return {
+    users: [{ user: 'Melendo', pass: '02260523112019', role: 'admin' }],
+    cyreles: sampleData()
+  };
+}
+
+function sampleData() {
+  return [
+    {
+      id: 'C001', codigo: 'CYR-2024-001', nombre: 'Salchichón Premium 500g',
+      material: 'polietileno', colores: 6, lpi: 150,
+      tirajes: 320000, vidaMax: 1000000,
+      foto: null, notas: 'Cyrel en buen estado. Tramas 1-3% revisar.',
+      fechaCreacion: '2024-01-15',
+      inspecciones: [{
+        fecha: '2024-11-20', defectos: ['Pinhole'],
+        estado: 'advertencia', vidaUtil: 68,
+        analisis: 'Cyrel presenta pinhole menor en zona de trama. Recomendado para 2 tirajes más.'
+      }]
+    },
+    {
+      id: 'C002', codigo: 'CYR-2024-002', nombre: 'Mortadela Familiar 1kg',
+      material: 'bopp', colores: 4, lpi: 133,
+      tirajes: 890000, vidaMax: 1000000,
+      foto: null, notas: 'Desgaste avanzado. Evaluar reemplazo.',
+      fechaCreacion: '2024-03-10',
+      inspecciones: [{
+        fecha: '2024-11-18', defectos: ['Desgaste relieve', 'Trama colapsada', 'Crack'],
+        estado: 'critico', vidaUtil: 11,
+        analisis: 'Cyrel en estado crítico. Múltiples defectos. Reemplazar urgente.'
+      }]
+    },
+    {
+      id: 'C003', codigo: 'CYR-2024-003', nombre: 'Chorizo Santarrosano 250g',
+      material: 'poliester', colores: 5, lpi: 150,
+      tirajes: 120000, vidaMax: 1000000,
+      foto: null, notas: 'Nuevo. Sin defectos.',
+      fechaCreacion: '2024-10-05',
+      inspecciones: []
+    }
+  ];
+}
+
+let db = loadDB();
+let currentUser = null;
+let selectedDefects = [];
+let generatedKey = null;
+let activeStreams = {};
+
+// ══════════════════════════════════════════════════════════════
+//  AUTH
+// ══════════════════════════════════════════════════════════════
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const found = db.users.find(x => x.user === u && x.pass === p);
+  if (found) {
+    currentUser = found;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('app').style.flexDirection = 'column';
+    renderDashboard();
+    populateCyrelSelects();
+  } else {
+    document.getElementById('loginErr').textContent = '⚠️ Usuario o contraseña incorrectos';
+    setTimeout(() => document.getElementById('loginErr').textContent = '', 2500);
+  }
+}
+
+function doLogout() {
+  stopAllStreams();
+  currentUser = null;
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+}
+
+document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+// ══════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════════════════════════
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  const tabs = ['dashboard','inventario','nuevo','inspeccion','comparar','excel'];
+  const idx = tabs.indexOf(id);
+  document.querySelectorAll('.nav-tab')[idx].classList.add('active');
+
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'inventario') renderInventario();
+  if (id === 'inspeccion' || id === 'comparar') populateCyrelSelects();
+  if (id === 'excel') setTimeout(() => renderPreviewTable(buildInventarioRows()), 100);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  DASHBOARD
+// ══════════════════════════════════════════════════════════════
+function renderDashboard() {
+  const cyreles = db.cyreles;
+  const total = cyreles.length;
+  const criticos = cyreles.filter(c => lastEstado(c) === 'critico').length;
+  const advertencias = cyreles.filter(c => lastEstado(c) === 'advertencia').length;
+  const buenos = cyreles.filter(c => lastEstado(c) === 'bueno').length;
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">Total Cyreles</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--accent3)">${buenos}</div><div class="stat-label">En buen estado</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--warn)">${advertencias}</div><div class="stat-label">Con advertencia</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--danger)">${criticos}</div><div class="stat-label">Críticos</div></div>
+  `;
+
+  const crit = cyreles.filter(c => lastEstado(c) === 'critico');
+  document.getElementById('criticos-list').innerHTML = crit.length
+    ? crit.map(c => cyrelRowHtml(c)).join('')
+    : '<div class="empty-state"><div class="icon">✅</div><p>Sin cyreles críticos</p></div>';
+
+  const rec = [...cyreles].sort((a,b) => b.fechaCreacion.localeCompare(a.fechaCreacion)).slice(0,3);
+  document.getElementById('recientes-list').innerHTML = rec.map(c => cyrelRowHtml(c)).join('');
+}
+
+function lastEstado(c) {
+  if (!c.inspecciones.length) return 'bueno';
+  return c.inspecciones[c.inspecciones.length - 1].estado;
+}
+
+function lastVida(c) {
+  if (!c.inspecciones.length) {
+    return Math.round(100 - (c.tirajes / c.vidaMax) * 100);
+  }
+  return c.inspecciones[c.inspecciones.length - 1].vidaUtil;
+}
+
+function cyrelRowHtml(c) {
+  const estado = lastEstado(c);
+  const vida = lastVida(c);
+  const badgeClass = estado === 'bueno' ? 'badge-good' : estado === 'advertencia' ? 'badge-warn' : 'badge-bad';
+  const badgeLabel = estado === 'bueno' ? '✅ Bueno' : estado === 'advertencia' ? '⚠️ Advertencia' : '❌ Crítico';
+  const barColor = vida > 50 ? 'var(--accent3)' : vida > 20 ? 'var(--warn)' : 'var(--danger)';
+
+  return `
+  <div class="cyrel-card" onclick="openCyrelDetail('${c.id}')">
+    <div class="cyrel-card-header">
+      <div class="cyrel-thumb">
+        ${c.foto ? `<img src="${c.foto}" alt="">` : '⬡'}
+      </div>
+      <div class="cyrel-info">
+        <div class="cyrel-code">${c.codigo}</div>
+        <div class="cyrel-name">${c.nombre}</div>
+        <div class="cyrel-meta">${c.material.toUpperCase()} · ${c.colores} colores · ${c.lpi} lpi</div>
+      </div>
+      <span class="badge ${badgeClass}">${badgeLabel}</span>
+    </div>
+    <div class="vida-bar-wrap">
+      <div class="vida-bar-label"><span>Vida útil</span><span>${vida}%</span></div>
+      <div class="vida-bar"><div class="vida-bar-fill" style="width:${vida}%;background:${barColor}"></div></div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  INVENTARIO
+// ══════════════════════════════════════════════════════════════
+function renderInventario() {
+  const q = (document.getElementById('searchInput').value || '').toLowerCase();
+  const fe = document.getElementById('filterEstado').value;
+  const fm = document.getElementById('filterMaterial').value;
+
+  let items = db.cyreles.filter(c => {
+    const match = !q || c.codigo.toLowerCase().includes(q) || c.nombre.toLowerCase().includes(q);
+    const estOk = !fe || lastEstado(c) === fe;
+    const matOk = !fm || c.material === fm;
+    return match && estOk && matOk;
+  });
+
+  document.getElementById('cyrelGrid').innerHTML = items.length
+    ? items.map(c => cyrelRowHtml(c)).join('')
+    : '<div class="empty-state"><div class="icon">🔍</div><p>Sin resultados</p></div>';
+}
+
+// ══════════════════════════════════════════════════════════════
+//  DETALLE CYREL
+// ══════════════════════════════════════════════════════════════
+function openCyrelDetail(id) {
+  const c = db.cyreles.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('mdTitle').textContent = `${c.codigo} · ${c.nombre}`;
+
+  const estado = lastEstado(c);
+  const vida = lastVida(c);
+  const barColor = vida > 50 ? 'var(--accent3)' : vida > 20 ? 'var(--warn)' : 'var(--danger)';
+  const ultInsp = c.inspecciones.length ? c.inspecciones[c.inspecciones.length-1] : null;
+
+  document.getElementById('mdContent').innerHTML = `
+    ${c.foto ? `<img src="${c.foto}" style="width:100%;border-radius:var(--radius);max-height:200px;object-fit:cover;margin-bottom:14px;">` : ''}
+
+    <div class="stats-grid" style="margin-bottom:14px;">
+      <div class="stat-card"><div class="stat-num" style="font-size:22px;">${c.tirajes.toLocaleString()}</div><div class="stat-label">Tirajes totales</div></div>
+      <div class="stat-card"><div class="stat-num" style="font-size:22px;color:${barColor};">${vida}%</div><div class="stat-label">Vida útil</div></div>
+    </div>
+
+    <div class="vida-bar-wrap" style="margin:0 0 14px;">
+      <div class="vida-bar"><div class="vida-bar-fill" style="width:${vida}%;background:${barColor}"></div></div>
+    </div>
+
+    <div class="trama-grid">
+      <div class="trama-cell"><div class="val">${c.colores}</div>Colores</div>
+      <div class="trama-cell"><div class="val">${c.lpi}</div>LPI</div>
+      <div class="trama-cell"><div class="val">${c.material.toUpperCase().slice(0,4)}</div>Sustrato</div>
+    </div>
+
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px;">
+      📅 Registrado: ${c.fechaCreacion} &nbsp;|&nbsp; ${c.inspecciones.length} inspección(es)
+    </div>
+
+    ${c.notas ? `<div style="font-size:12px;color:var(--text);background:var(--bg);border-radius:var(--radius);padding:10px;margin-bottom:12px;">${c.notas}</div>` : ''}
+
+    ${ultInsp ? `
+    <div style="background:var(--surface2);border-radius:var(--radius);padding:12px;margin-bottom:14px;">
+      <div style="font-size:11px;letter-spacing:1px;color:var(--text2);text-transform:uppercase;margin-bottom:8px;">Última inspección · ${ultInsp.fecha}</div>
+      <div class="tag-list">
+        ${ultInsp.defectos.map(d => `<span class="tag" style="border-color:var(--danger);color:var(--danger);">${d}</span>`).join('')}
+      </div>
+      <div style="font-size:12px;margin-top:8px;color:var(--text);">${ultInsp.analisis}</div>
+    </div>` : '<div style="font-size:12px;color:var(--text2);margin-bottom:12px;">Sin inspecciones registradas.</div>'}
+
+    <div class="cyrel-actions">
+      <button class="btn btn-ghost btn-sm" onclick="editarTirajes('${c.id}')">📝 Actualizar tirajes</button>
+      <button class="btn btn-danger btn-sm" onclick="eliminarCyrel('${c.id}')">🗑️ Eliminar</button>
+    </div>
+  `;
+  openModal('cyrelDetailModal');
+}
+
+function editarTirajes(id) {
+  const c = db.cyreles.find(x => x.id === id);
+  const nuevos = prompt(`Tirajes actuales: ${c.tirajes}\nNuevo total de tirajes:`);
+  if (nuevos && !isNaN(nuevos)) {
+    c.tirajes = parseInt(nuevos);
+    saveDB(db);
+    openCyrelDetail(id);
+    notify('✅ Tirajes actualizados');
+  }
+}
+
+function eliminarCyrel(id) {
+  if (!confirm('¿Eliminar este cyrel del inventario?')) return;
+  db.cyreles = db.cyreles.filter(x => x.id !== id);
+  saveDB(db);
+  closeModal('cyrelDetailModal');
+  renderInventario();
+  notify('🗑️ Cyrel eliminado');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  NUEVO CYREL
+// ══════════════════════════════════════════════════════════════
+function previewImg(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('imgPreview').src = e.target.result;
+    document.getElementById('imgPreview').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function guardarCyrel() {
+  const codigo = document.getElementById('nCodigo').value.trim();
+  const nombre = document.getElementById('nNombre').value.trim();
+  if (!codigo || !nombre) { notify('⚠️ Código y nombre son obligatorios', 'warn'); return; }
+
+  const foto = document.getElementById('imgPreview').style.display !== 'none'
+    ? document.getElementById('imgPreview').src : null;
+
+  const cyrel = {
+    id: 'C' + Date.now(),
+    codigo, nombre,
+    material: document.getElementById('nMaterial').value,
+    colores: parseInt(document.getElementById('nColores').value) || 4,
+    lpi: parseInt(document.getElementById('nLpi').value) || 150,
+    tirajes: parseInt(document.getElementById('nTirajes').value) || 0,
+    vidaMax: parseInt(document.getElementById('nVidaMax').value) || 1000000,
+    foto,
+    notas: document.getElementById('nNotas').value,
+    fechaCreacion: new Date().toISOString().slice(0,10),
+    inspecciones: []
+  };
+
+  db.cyreles.push(cyrel);
+  saveDB(db);
+  notify('✅ Cyrel guardado exitosamente');
+  populateCyrelSelects();
+
+  // Clear form
+  ['nCodigo','nNombre','nLpi','nTirajes','nVidaMax','nNotas'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('imgPreview').style.display = 'none';
+  document.getElementById('imgFile').value = '';
+  showSection('inventario');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  CAMERA
+// ══════════════════════════════════════════════════════════════
+async function startCamera(videoId, canvasId) {
+  try {
+    if (activeStreams[videoId]) {
+      activeStreams[videoId].getTracks().forEach(t => t.stop());
+    }
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+    });
+    activeStreams[videoId] = stream;
+    const v = document.getElementById(videoId);
+    v.srcObject = stream;
+    v.style.display = 'block';
+    document.getElementById(canvasId).style.display = 'none';
+  } catch (e) {
+    notify('⚠️ No se pudo acceder a la cámara: ' + e.message, 'warn');
+  }
+}
+
+function captureCamera(videoId, canvasId, resultId) {
+  const v = document.getElementById(videoId);
+  const c = document.getElementById(canvasId);
+  if (!v.srcObject) { notify('⚠️ Primero abre la cámara', 'warn'); return; }
+  c.width = v.videoWidth || 640;
+  c.height = v.videoHeight || 480;
+  c.getContext('2d').drawImage(v, 0, 0);
+  c.style.display = 'block';
+  v.style.display = 'none';
+  if (activeStreams[videoId]) {
+    activeStreams[videoId].getTracks().forEach(t => t.stop());
+    delete activeStreams[videoId];
+  }
+  notify('📸 Imagen capturada');
+}
+
+function loadFromFile(input, canvasId, resultId) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.getElementById(canvasId);
+      c.width = img.width;
+      c.height = img.height;
+      c.getContext('2d').drawImage(img, 0, 0);
+      c.style.display = 'block';
+      notify('🖼️ Imagen cargada');
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function stopAllStreams() {
+  Object.values(activeStreams).forEach(s => s.getTracks().forEach(t => t.stop()));
+  activeStreams = {};
+}
+
+function canvasToBase64(canvasId) {
+  const c = document.getElementById(canvasId);
+  return c.toDataURL('image/jpeg', 0.85).split(',')[1];
+}
+
+// ══════════════════════════════════════════════════════════════
+//  DEFECTOS CHECKLIST
+// ══════════════════════════════════════════════════════════════
+function toggleDefect(el, name) {
+  el.classList.toggle('selected');
+  if (el.classList.contains('selected')) {
+    if (!selectedDefects.includes(name)) selectedDefects.push(name);
+  } else {
+    selectedDefects = selectedDefects.filter(d => d !== name);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  POPULATE SELECTS
+// ══════════════════════════════════════════════════════════════
+function populateCyrelSelects() {
+  const opts = db.cyreles.map(c => `<option value="${c.id}">${c.codigo} - ${c.nombre}</option>`).join('');
+  ['inspecCyrelSel','compCyrelSel'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = opts || '<option>Sin cyreles registrados</option>';
+  });
+}
+
+function loadRefImage() {
+  const id = document.getElementById('compCyrelSel').value;
+  const c = db.cyreles.find(x => x.id === id);
+  if (!c || !c.foto) return;
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.getElementById('refCanvas');
+    canvas.width = img.width; canvas.height = img.height;
+    canvas.getContext('2d').drawImage(img, 0, 0);
+  };
+  img.src = c.foto;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  AI CALLS
+// ══════════════════════════════════════════════════════════════
+async function callClaudeAPI(messages, systemPrompt = '') {
+  const body = {
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 1000,
+    system: systemPrompt,
+    messages
+  };
+
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
+  if (!resp.ok) {
+    const err = await resp.text();
+    throw new Error('API error: ' + err);
+  }
+
+  const data = await resp.json();
+  return data.content.map(b => b.text || '').join('');
+}
+
+// ── ANÁLISIS CYREL ──
+async function analizarCyrelIA() {
+  const cyrelId = document.getElementById('inspecCyrelSel').value;
+  const cyrel = db.cyreles.find(c => c.id === cyrelId);
+  const resultEl = document.getElementById('inspResult');
+
+  resultEl.innerHTML = '<div class="spinner"></div> Analizando con IA...';
+
+  const defectosTexto = selectedDefects.length ? selectedDefects.join(', ') : 'Ninguno marcado manualmente';
+  const vida = Math.round(100 - (cyrel.tirajes / cyrel.vidaMax) * 100);
+
+  const canvas = document.getElementById('inspCanvas');
+  const tieneImagen = canvas.style.display !== 'none' && canvas.width > 0;
+
+  let messages;
+
+  if (tieneImagen) {
+    const imgData = canvasToBase64('inspCanvas');
+    messages = [{
+      role: 'user',
+      content: [
+        {
+          type: 'image',
+          source: { type: 'base64', media_type: 'image/jpeg', data: imgData }
+        },
+        {
+          type: 'text',
+          text: `Analiza esta imagen de un cyrel flexográfico.
+Datos del cyrel:
+- Código: ${cyrel.codigo}
+- Arte: ${cyrel.nombre}
+- Material sustrato: ${cyrel.material}
+- Tirajes realizados: ${cyrel.tirajes.toLocaleString()} de ${cyrel.vidaMax.toLocaleString()}
+- Vida útil restante estimada: ${vida}%
+- LPI: ${cyrel.lpi}
+- Defectos marcados por operario: ${defectosTexto}
+
+Proporciona:
+1. Estado general del cyrel (Bueno / Advertencia / Crítico)
+2. Defectos visibles en relieves y tramas detectados en la imagen
+3. Estimación de vida útil restante (%)
+4. Recomendaciones de uso o reemplazo
+5. Próximos tirajes recomendados antes de reinspección
+
+Responde en español, formato claro y conciso.`
+        }
+      ]
+    }];
+  } else {
+    messages = [{
+      role: 'user',
+      content: `Analiza el estado de este cyrel flexográfico sin imagen visual, basándote en los datos:
+- Código: ${cyrel.codigo}
+- Arte: ${cyrel.nombre}
+- Material sustrato: ${cyrel.material}
+- Tirajes realizados: ${cyrel.tirajes.toLocaleString()} de ${cyrel.vidaMax.toLocaleString()}
+- Vida útil restante estimada: ${vida}%
+- LPI: ${cyrel.lpi}
+- Defectos marcados por operario: ${defectosTexto}
+
+Proporciona:
+1. Estado general del cyrel (Bueno / Advertencia / Crítico)
+2. Evaluación de defectos reportados
+3. Estimación de vida útil restante (%)
+4. Recomendaciones de uso o reemplazo
+5. Próximos tirajes recomendados
+
+Responde en español, formato claro.`
+    }];
+  }
+
+  try {
+    const resp = await callClaudeAPI(messages, 'Eres un experto en flexografía y control de calidad de cyreles (planchas fotopolímeras). Das diagnósticos técnicos precisos en español.');
+
+    // Parse estado
+    let estado = 'bueno';
+    if (/crítico|critical|urgente|reemplazar/i.test(resp)) estado = 'critico';
+    else if (/advertencia|precaución|revisar|atención/i.test(resp)) estado = 'advertencia';
+
+    resultEl.innerHTML = `
+      <div class="ai-msg assistant">
+        <div class="role">🤖 Análisis IA · ${new Date().toLocaleTimeString('es-CO')}</div>
+        <div style="white-space:pre-wrap;">${resp}</div>
+      </div>`;
+
+    // Store result for saving
+    window._lastInspResult = { resp, estado, defectos: [...selectedDefects], vida };
+    notify('✅ Análisis completado');
+  } catch (e) {
+    resultEl.innerHTML = `<div style="color:var(--danger)">Error: ${e.message}<br><br><i>Consejo: Verifica que la app esté ejecutándose con acceso a la API de Claude.</i></div>`;
+  }
+}
+
+function guardarInspeccion() {
+  if (!window._lastInspResult) { notify('⚠️ Primero realiza un análisis', 'warn'); return; }
+  const cyrelId = document.getElementById('inspecCyrelSel').value;
+  const cyrel = db.cyreles.find(c => c.id === cyrelId);
+  cyrel.inspecciones.push({
+    fecha: new Date().toISOString().slice(0,10),
+    defectos: window._lastInspResult.defectos,
+    estado: window._lastInspResult.estado,
+    vidaUtil: window._lastInspResult.vida,
+    analisis: window._lastInspResult.resp.slice(0, 500)
+  });
+  saveDB(db);
+  notify('💾 Inspección guardada');
+  window._lastInspResult = null;
+}
+
+// ── COMPARAR ARTES ──
+async function compararArtes() {
+  const cyrelId = document.getElementById('compCyrelSel').value;
+  const cyrel = db.cyreles.find(c => c.id === cyrelId);
+  const resultEl = document.getElementById('compResult');
+
+  const printCanvas = document.getElementById('printCanvas');
+  if (printCanvas.style.display === 'none' || !printCanvas.width) {
+    notify('⚠️ Captura primero la imagen de la impresión', 'warn');
+    return;
+  }
+
+  resultEl.innerHTML = '<div class="spinner"></div> Comparando con IA...';
+
+  const printImg = canvasToBase64('printCanvas');
+
+  let messages;
+
+  // If there's a reference image
+  const refCanvas = document.getElementById('refCanvas');
+  if (refCanvas.width > 0) {
+    const refImg = canvasToBase64('refCanvas');
+    messages = [{
+      role: 'user',
+      content: [
+        {
+          type: 'image',
+          source: { type: 'base64', media_type: 'image/jpeg', data: refImg }
+        },
+        {
+          type: 'image',
+          source: { type: 'base64', media_type: 'image/jpeg', data: printImg }
+        },
+        {
+          type: 'text',
+          text: `La primera imagen es el arte de referencia del cyrel "${cyrel.nombre}" (${cyrel.codigo}).
+La segunda imagen es la impresión obtenida en el sustrato ${cyrel.material}.
+
+Compara ambas imágenes y evalúa:
+1. Calidad de registro de colores
+2. Fidelidad de tramas y medios tonos
+3. Desviaciones de color (si las detectas)
+4. Problemas de presión o impresión
+5. Calificación global de calidad (0-100)
+6. Recomendaciones de ajuste para el operario
+
+Sé técnico y específico. Responde en español.`
+        }
+      ]
+    }];
+  } else {
+    messages = [{
+      role: 'user',
+      content: [
+        {
+          type: 'image',
+          source: { type: 'base64', media_type: 'image/jpeg', data: printImg }
+        },
+        {
+          type: 'text',
+          text: `Analiza esta imagen de una impresión flexográfica del arte "${cyrel.nombre}" impreso en sustrato ${cyrel.material} con cyrel de ${cyrel.lpi} LPI.
+
+Evalúa:
+1. Calidad general de la impresión
+2. Problemas visibles (moteado, bridging, ghosting, etc.)
+3. Estado de las tramas y medios tonos
+4. Calificación de calidad (0-100)
+5. Recomendaciones de ajuste
+
+Responde en español con criterio técnico flexográfico.`
+        }
+      ]
+    }];
+  }
+
+  try {
+    const resp = await callClaudeAPI(messages, 'Eres experto en control de calidad flexográfico. Evalúas impresiones con criterio técnico sobre densidad, registro, tramas, presión y fidelidad de color. Respondes en español.');
+    resultEl.innerHTML = `
+      <div class="ai-msg assistant">
+        <div class="role">🤖 Verificación de Arte · ${new Date().toLocaleTimeString('es-CO')}</div>
+        <div style="white-space:pre-wrap;">${resp}</div>
+      </div>`;
+    notify('✅ Comparación completada');
+  } catch (e) {
+    resultEl.innerHTML = `<div style="color:var(--danger)">Error: ${e.message}</div>`;
+  }
+}
+
+// ── GENERAR CLAVE CON IA ──
+async function generarClaveIA() {
+  const canvas = document.getElementById('keyCanvas');
+  const resultEl = document.getElementById('keyGenResult');
+  const dispEl = document.getElementById('keyGenDisplay');
+
+  if (canvas.style.display === 'none' || !canvas.width) {
+    notify('⚠️ Primero captura o carga una imagen', 'warn');
+    return;
+  }
+
+  resultEl.innerHTML = '<span class="spinner"></span> Generando clave...';
+  dispEl.style.display = 'none';
+  document.getElementById('btnAplicarClave').style.display = 'none';
+
+  const imgData = canvasToBase64('keyCanvas');
+
+  try {
+    const resp = await callClaudeAPI([{
+      role: 'user',
+      content: [
+        {
+          type: 'image',
+          source: { type: 'base64', media_type: 'image/jpeg', data: imgData }
+        },
+        {
+          type: 'text',
+          text: 'Analiza esta imagen y genera UNA contraseña segura de exactamente 10 caracteres basada en elementos visuales que ves (colores, objetos, formas, texturas). La clave debe tener letras mayúsculas, minúsculas y números. NO uses caracteres especiales. Responde SOLO con la contraseña, sin explicación ni texto adicional.'
+        }
+      ]
+    }], '');
+
+    const clave = resp.trim().replace(/[^a-zA-Z0-9]/g, '').slice(0, 12);
+    generatedKey = clave || 'Cyrel' + Math.floor(Math.random() * 9999);
+
+    resultEl.innerHTML = '✅ Clave generada desde la imagen:';
+    dispEl.textContent = generatedKey;
+    dispEl.style.display = 'block';
+    document.getElementById('btnAplicarClave').style.display = 'block';
+    notify('🔑 Clave generada con IA');
+  } catch (e) {
+    resultEl.innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`;
+  }
+}
+
+function aplicarClaveGenerada() {
+  if (!generatedKey) return;
+  const oldPass = document.getElementById('keyOld').value;
+  const user = db.users.find(u => u.user === currentUser.user);
+  if (oldPass !== user.pass) {
+    document.getElementById('keyErr').textContent = '⚠️ Confirma tu contraseña actual para aplicar la nueva clave';
+    return;
+  }
+  user.pass = generatedKey;
+  currentUser.pass = generatedKey;
+  saveDB(db);
+  notify('✅ Clave actualizada a: ' + generatedKey);
+  closeModal('keyModal');
+  generatedKey = null;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  CAMBIO DE CLAVE MANUAL
+// ══════════════════════════════════════════════════════════════
+function cambiarClave() {
+  const old = document.getElementById('keyOld').value;
+  const nueva = document.getElementById('keyNew').value;
+  const conf = document.getElementById('keyConfirm').value;
+  const errEl = document.getElementById('keyErr');
+
+  const user = db.users.find(u => u.user === currentUser.user);
+
+  if (old !== user.pass) { errEl.textContent = '⚠️ Contraseña actual incorrecta'; return; }
+  if (nueva.length < 6) { errEl.textContent = '⚠️ Mínimo 6 caracteres'; return; }
+  if (nueva !== conf) { errEl.textContent = '⚠️ Las contraseñas no coinciden'; return; }
+
+  user.pass = nueva;
+  currentUser.pass = nueva;
+  saveDB(db);
+  errEl.style.color = 'var(--accent3)';
+  errEl.textContent = '✅ Contraseña actualizada exitosamente';
+  setTimeout(() => { errEl.textContent = ''; errEl.style.color = 'var(--danger)'; }, 3000);
+  ['keyOld','keyNew','keyConfirm'].forEach(id => document.getElementById(id).value = '');
+}
+
+function openChangeKey() {
+  generatedKey = null;
+  document.getElementById('keyGenDisplay').style.display = 'none';
+  document.getElementById('btnAplicarClave').style.display = 'none';
+  document.getElementById('keyGenResult').innerHTML = '';
+  document.getElementById('keyErr').textContent = '';
+  openModal('keyModal');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  MODALS
+// ══════════════════════════════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
+});
+
+// ══════════════════════════════════════════════════════════════
+//  NOTIFICATIONS
+// ══════════════════════════════════════════════════════════════
+function notify(msg, type = 'ok') {
+  const n = document.createElement('div');
+  n.className = 'notif';
+  n.style.borderColor = type === 'warn' ? 'var(--warn)' : 'var(--accent3)';
+  n.textContent = msg;
+  document.body.appendChild(n);
+  setTimeout(() => n.remove(), 2800);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  db = loadDB();
+  // Try auto-login from session
+  const sess = sessionStorage.getItem('cyrel_sess');
+  if (sess) {
+    const u = db.users.find(x => x.user === sess);
+    if (u) {
+      currentUser = u;
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('app').style.display = 'flex';
+      document.getElementById('app').style.flexDirection = 'column';
+      renderDashboard();
+      populateCyrelSelects();
+    }
+  }
+});
+
+// Save session
+window.addEventListener('beforeunload', () => {
+  if (currentUser) sessionStorage.setItem('cyrel_sess', currentUser.user);
+});
+
+// ══════════════════════════════════════════════════════════════
+//  EXCEL / PC FUNCTIONS
+// ══════════════════════════════════════════════════════════════
+
+// Cargar SheetJS dinámicamente
+function loadSheetJS(cb) {
+  if (window.XLSX) { cb(); return; }
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  s.onload = cb;
+  document.head.appendChild(s);
+}
+
+function buildInventarioRows() {
+  return db.cyreles.map(c => {
+    const vida = lastVida(c);
+    const estado = lastEstado(c);
+    const ultInsp = c.inspecciones.length ? c.inspecciones[c.inspecciones.length-1] : null;
+    return {
+      'Código': c.codigo,
+      'Nombre Arte': c.nombre,
+      'Material Sustrato': c.material,
+      'Colores': c.colores,
+      'LPI': c.lpi,
+      'Tirajes Realizados': c.tirajes,
+      'Vida Útil Máx (tirajes)': c.vidaMax,
+      'Vida Útil Restante (%)': vida,
+      'Estado': estado === 'bueno' ? 'Bueno' : estado === 'advertencia' ? 'Advertencia' : 'Crítico',
+      'Fecha Registro': c.fechaCreacion,
+      'Última Inspección': ultInsp ? ultInsp.fecha : 'Sin inspección',
+      'Defectos Detectados': ultInsp ? ultInsp.defectos.join(', ') : '',
+      'Notas': c.notas || ''
+    };
+  });
+}
+
+function buildInspeccionesRows() {
+  const rows = [];
+  db.cyreles.forEach(c => {
+    c.inspecciones.forEach(ins => {
+      rows.push({
+        'Código Cyrel': c.codigo,
+        'Nombre Arte': c.nombre,
+        'Fecha Inspección': ins.fecha,
+        'Estado': ins.estado,
+        'Vida Útil (%)': ins.vidaUtil,
+        'Defectos': ins.defectos.join(', '),
+        'Análisis IA': ins.analisis
+      });
+    });
+  });
+  return rows.length ? rows : [{ 'Info': 'Sin inspecciones registradas' }];
+}
+
+function exportarInventarioExcel() {
+  loadSheetJS(() => {
+    const rows = buildInventarioRows();
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(rows);
+
+    // Ancho de columnas
+    ws['!cols'] = [
+      {wch:16},{wch:30},{wch:16},{wch:8},{wch:6},
+      {wch:18},{wch:22},{wch:18},{wch:12},{wch:14},
+      {wch:18},{wch:24},{wch:40}
+    ];
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Inventario Cyreles');
+
+    // Hoja resumen
+    const resumen = [
+      { 'Campo': 'Total Cyreles', 'Valor': db.cyreles.length },
+      { 'Campo': 'En Buen Estado', 'Valor': db.cyreles.filter(c=>lastEstado(c)==='bueno').length },
+      { 'Campo': 'Con Advertencia', 'Valor': db.cyreles.filter(c=>lastEstado(c)==='advertencia').length },
+      { 'Campo': 'Críticos', 'Valor': db.cyreles.filter(c=>lastEstado(c)==='critico').length },
+      { 'Campo': 'Fecha Export', 'Valor': new Date().toLocaleString('es-CO') },
+      { 'Campo': 'Exportado por', 'Valor': currentUser.user }
+    ];
+    const wsRes = XLSX.utils.json_to_sheet(resumen);
+    wsRes['!cols'] = [{wch:22},{wch:30}];
+    XLSX.utils.book_append_sheet(wb, wsRes, 'Resumen');
+
+    XLSX.writeFile(wb, `Inventario_Cyreles_${new Date().toISOString().slice(0,10)}.xlsx`);
+    notify('✅ Excel exportado correctamente');
+    renderPreviewTable(rows);
+  });
+}
+
+function exportarInspeccionesExcel() {
+  loadSheetJS(() => {
+    const rows = buildInspeccionesRows();
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(rows);
+    ws['!cols'] = [{wch:16},{wch:28},{wch:16},{wch:12},{wch:14},{wch:28},{wch:60}];
+    XLSX.utils.book_append_sheet(wb, ws, 'Inspecciones');
+    XLSX.writeFile(wb, `Inspecciones_Cyreles_${new Date().toISOString().slice(0,10)}.xlsx`);
+    notify('✅ Inspecciones exportadas');
+  });
+}
+
+function exportarPlantilla() {
+  loadSheetJS(() => {
+    const plantilla = [{
+      'Código': 'CYR-2025-001',
+      'Nombre Arte': 'Ejemplo Arte',
+      'Material Sustrato': 'polietileno',
+      'Colores': 4,
+      'LPI': 150,
+      'Tirajes Realizados': 0,
+      'Vida Útil Máx (tirajes)': 1000000,
+      'Notas': 'Observaciones aquí'
+    }];
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(plantilla);
+    ws['!cols'] = [{wch:16},{wch:28},{wch:18},{wch:8},{wch:6},{wch:18},{wch:22},{wch:30}];
+
+    // Nota de instrucciones
+    const instrucciones = [
+      { 'Instrucción': 'Materiales válidos: polietileno, bopp, poliester, papel, nylon' },
+      { 'Instrucción': 'LPI común: 120, 133, 150, 175' },
+      { 'Instrucción': 'No elimines los encabezados de la hoja "Datos"' },
+      { 'Instrucción': 'Guarda como .xlsx antes de importar' }
+    ];
+    const wsI = XLSX.utils.json_to_sheet(instrucciones);
+    wsI['!cols'] = [{wch:70}];
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Datos');
+    XLSX.utils.book_append_sheet(wb, wsI, 'Instrucciones');
+    XLSX.writeFile(wb, 'Plantilla_Cyreles.xlsx');
+    notify('📄 Plantilla descargada');
+  });
+}
+
+function renderPreviewTable(rows) {
+  if (!rows.length) return;
+  const t = document.getElementById('previewTable');
+  const keys = Object.keys(rows[0]);
+  const thStyle = 'background:var(--surface2);color:var(--accent);padding:6px 8px;font-size:10px;letter-spacing:1px;white-space:nowrap;border:1px solid var(--border);';
+  const tdStyle = 'padding:5px 8px;font-size:10px;border:1px solid var(--border);color:var(--text);white-space:nowrap;';
+  let html = '<thead><tr>' + keys.map(k=>`<th style="${thStyle}">${k}</th>`).join('') + '</tr></thead><tbody>';
+  rows.slice(0,5).forEach(r => {
+    html += '<tr>' + keys.map(k=>`<td style="${tdStyle}">${r[k]??''}</td>`).join('') + '</tr>';
+  });
+  if (rows.length > 5) html += `<tr><td colspan="${keys.length}" style="${tdStyle}color:var(--text2);">... y ${rows.length-5} registros más</td></tr>`;
+  html += '</tbody>';
+  t.innerHTML = html;
+}
+
+// ── IMPORTAR ──
+let _importData = [];
+
+function importarExcel(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  loadSheetJS(() => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        let rows = [];
+
+        if (file.name.endsWith('.csv')) {
+          // CSV
+          const text = new TextDecoder('utf-8').decode(e.target.result);
+          const lines = text.split('\n').filter(l => l.trim());
+          const headers = lines[0].split(',').map(h => h.trim().replace(/"/g,''));
+          rows = lines.slice(1).map(line => {
+            const vals = line.split(',').map(v => v.trim().replace(/"/g,''));
+            const obj = {};
+            headers.forEach((h,i) => obj[h] = vals[i] || '');
+            return obj;
+          });
+        } else {
+          // Excel
+          const wb = XLSX.read(e.target.result, { type: 'array' });
+          const wsName = wb.SheetNames.find(n => n.toLowerCase().includes('dato') || n === wb.SheetNames[0]);
+          const ws = wb.Sheets[wsName];
+          rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+        }
+
+        _importData = rows.filter(r => r['Código'] || r['codigo']);
+        if (!_importData.length) {
+          document.getElementById('importMsg').innerHTML = '<span style="color:var(--danger)">⚠️ No se encontraron datos válidos. Usa la plantilla descargable.</span>';
+          return;
+        }
+
+        // Preview
+        renderImportTable(_importData);
+        document.getElementById('importPreview').style.display = 'block';
+        document.getElementById('importMsg').innerHTML = `<span style="color:var(--accent3)">✅ ${_importData.length} registros listos para importar</span>`;
+      } catch(err) {
+        document.getElementById('importMsg').innerHTML = `<span style="color:var(--danger)">Error leyendo archivo: ${err.message}</span>`;
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+function renderImportTable(rows) {
+  const t = document.getElementById('importTable');
+  const keys = Object.keys(rows[0]);
+  const thStyle = 'background:var(--surface2);color:var(--accent);padding:5px 7px;font-size:10px;border:1px solid var(--border);white-space:nowrap;';
+  const tdStyle = 'padding:4px 7px;font-size:10px;border:1px solid var(--border);color:var(--text);white-space:nowrap;';
+  let html = '<thead><tr>' + keys.map(k=>`<th style="${thStyle}">${k}</th>`).join('') + '</tr></thead><tbody>';
+  rows.slice(0,4).forEach(r => {
+    html += '<tr>' + keys.map(k=>`<td style="${tdStyle}">${r[k]??''}</td>`).join('') + '</tr>';
+  });
+  if (rows.length > 4) html += `<tr><td colspan="${keys.length}" style="${tdStyle}color:var(--text2);">... +${rows.length-4} más</td></tr>`;
+  html += '</tbody>';
+  t.innerHTML = html;
+}
+
+function confirmarImport() {
+  let nuevos = 0, actualizados = 0;
+  _importData.forEach(row => {
+    const codigo = (row['Código'] || row['codigo'] || '').trim();
+    const nombre = (row['Nombre Arte'] || row['nombre'] || '').trim();
+    if (!codigo) return;
+
+    const existe = db.cyreles.find(c => c.codigo === codigo);
+    const obj = {
+      codigo,
+      nombre: nombre || codigo,
+      material: (row['Material Sustrato'] || row['material'] || 'polietileno').toLowerCase(),
+      colores: parseInt(row['Colores'] || row['colores']) || 4,
+      lpi: parseInt(row['LPI'] || row['lpi']) || 150,
+      tirajes: parseInt(row['Tirajes Realizados'] || row['tirajes']) || 0,
+      vidaMax: parseInt(row['Vida Útil Máx (tirajes)'] || row['vidaMax']) || 1000000,
+      notas: row['Notas'] || row['notas'] || '',
+      fechaCreacion: new Date().toISOString().slice(0,10)
+    };
+
+    if (existe) {
+      Object.assign(existe, obj);
+      actualizados++;
+    } else {
+      db.cyreles.push({ id: 'I' + Date.now() + Math.random().toString(36).slice(2,6), foto: null, inspecciones: [], ...obj });
+      nuevos++;
+    }
+  });
+
+  saveDB(db);
+  populateCyrelSelects();
+  document.getElementById('importPreview').style.display = 'none';
+  document.getElementById('importMsg').innerHTML = `<span style="color:var(--accent3)">✅ Importación completa: ${nuevos} nuevos, ${actualizados} actualizados</span>`;
+  document.getElementById('excelFileInput').value = '';
+  _importData = [];
+  notify(`✅ ${nuevos} nuevos + ${actualizados} actualizados`);
+  renderPreviewTable(buildInventarioRows());
+}
+
+function cancelarImport() {
+  _importData = [];
+  document.getElementById('importPreview').style.display = 'none';
+  document.getElementById('importMsg').innerHTML = '';
+  document.getElementById('excelFileInput').value = '';
+}
+
+// ── BACKUP JSON ──
+function exportarJSON() {
+  const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Backup_Cyreles_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  notify('💾 Backup JSON descargado');
+}
+
+function importarJSON(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const restored = JSON.parse(e.target.result);
+      if (!restored.cyreles || !restored.users) throw new Error('Formato inválido');
+      if (!confirm(`¿Restaurar backup? Se reemplazarán ${restored.cyreles.length} cyreles.`)) return;
+      db = restored;
+      saveDB(db);
+      populateCyrelSelects();
+      renderDashboard();
+      notify('✅ Backup restaurado correctamente');
+    } catch(err) {
+      notify('⚠️ Error al restaurar: ' + err.message, 'warn');
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+// Render preview on section load - handled in showSection above
+</script>
+</body>
+</html>
